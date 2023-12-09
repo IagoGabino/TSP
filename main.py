@@ -5,7 +5,6 @@ from tatt import twiceAround
 from memory_profiler import memory_usage
 from opt import get_optimal_distance
 from ctfds import christofides
-from bnb import branch_and_bound
 
 def load_tsp_problem(file_path):
     # Carrega o problema TSP
@@ -60,11 +59,6 @@ def main():
     quality = 0
     if weight > 0:
         quality = optimal_distance / weight
-
-    # print(f"Peso total: {weight}")
-    # print(f"Tempo de execução: {execution_time} segundos")
-    # print(f"Uso de memória: {peak_memory} MB")
-    # print(f"Qualidade da solucao: {quality*100}%")
 
     # tudo em uma linha em sequencia
     print(f"{weight}, {execution_time}, {peak_memory}, {quality*100}%")

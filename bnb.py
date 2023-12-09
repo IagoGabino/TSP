@@ -1,4 +1,7 @@
 from heapq import heappush, heappop
+import tsplib95
+import time
+import memory_profiler
 
 # class Node to store information of search tree
 class Node:
@@ -22,7 +25,7 @@ def calculate_bound(path, adj):
     # add the smallest costs of edges for unvisited nodes
     for i in range(N):
         if i not in path:
-            min_edge = min(adj[i][j] if adj[i][j] > 0 else float('inf') for j in range(N) if j != i)
+            min_edge = sorted(adj[i])[1] if len(adj[i]) > 1 else float('inf')
             if min_edge == float('inf'):
                 return float('inf')  # return infinity if an edge does not exist
             lower_bound += min_edge
@@ -70,25 +73,61 @@ def best_first_search(adj, start=0):
     return best_cost, best_path
 
 def convert_to_matrix(graph):
-    # tsplib95 to adjacency matrix
+    # Obtém o número de nós do grafo
+    N = graph.dimension
+
+    # Inicializa a matriz de adjacência com infinito em todas as posições
     maxsize = float('inf')
-    N = graph.number_of_nodes()
     adj_matrix = [[0 if i == j else maxsize for i in range(N)] for j in range(N)]
-    for i, j, data in graph.edges(data=True):
-        # tsp instances start with node 1, so we need to subtract 1 from each node
-        adj_matrix[i-1][j-1] = data['weight'] 
-        adj_matrix[j-1][i-1] = data['weight']
+
+    # Preenche a matriz de adjacência com os pesos das arestas
+    for i in range(N):
+        for j in range(i + 1, N):
+            distance = graph.get_weight(i + 1, j + 1)
+            
+            # Preenche a matriz de adjacência com a distância calculada
+            adj_matrix[i][j] = distance
+            adj_matrix[j][i] = distance
+
     return adj_matrix
 
 def branch_and_bound(graph):
+    start = time.time()
+
     adj_matrix = convert_to_matrix(graph)
-    return best_first_search(adj_matrix)
+    cost, path = best_first_search(adj_matrix)
+
+    end = time.time()
+    execution_time = end - start
+
+    adjusted_path = [p + 1 for p in path]
+
+    return cost, adjusted_path, execution_time
 
 # tests
 if __name__ == "__main__":
-    import tsplib95
-    problem = tsplib95.load('lib/eil51.tsp')
-    graph = problem.get_graph()
-    weight, path = branch_and_bound(graph)
-    print("Peso total:", weight)
-    print("Caminho:", path)
+    # test
+    files = ['test10.tsp', 'test15.tsp']
+    folder = './test_bnb'
+
+    # header
+    with open('results_bnb.txt', 'w') as f:
+        f.write('Instancia, Custo, Tempo, Memoria\n')
+
+    for file in files:
+        print('Testing', file)
+        graph = tsplib95.load(f'{folder}/{file}')
+        cost, path, execution_time = branch_and_bound(graph)
+        mem_usage, retval = memory_profiler.memory_usage((branch_and_bound, (graph,)), retval=True, max_usage=True)
+        peak_memory = mem_usage
+        cost, path, execution_time = retval
+        cost, path, execution_time = branch_and_bound(graph)
+
+        # peak_memory = memory_profiler.memory_usage()[0]
+
+        # save to results_bnb.txt
+        with open('results_bnb.txt', 'a') as f:
+            f.write(f'{file}, {cost}, {execution_time}, {peak_memory}\n')
+            f.write(f'{path}\n')
+
+        

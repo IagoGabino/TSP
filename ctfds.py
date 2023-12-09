@@ -26,8 +26,7 @@ def christofides(graph):
 
     # find Eulerian circuit
     eulerian_circuit = list(nx.eulerian_circuit(MSTMultiGraph, source=1))
-
-    # convert to Hamiltonian cycle and calculate total weight
+   
     visited = set()
     hamiltonian_cycle = []
     total_weight = 0
@@ -36,10 +35,12 @@ def christofides(graph):
         if u not in visited:
             hamiltonian_cycle.append(u)
             visited.add(u)
-        total_weight += graph[u][v]['weight']
+            if len(hamiltonian_cycle) > 1:
+                total_weight += graph[hamiltonian_cycle[-2]][u]['weight']
 
-    # add the first node at the end to complete the cycle
+    # Fechando o ciclo e adicionando o peso da última aresta
     hamiltonian_cycle.append(hamiltonian_cycle[0])
+    total_weight += graph[hamiltonian_cycle[-2]][hamiltonian_cycle[-1]]['weight']
 
     end = time.time()
     execution_time = end - start
@@ -48,7 +49,7 @@ def christofides(graph):
 
 # tests
 if __name__ == "__main__":
-    problem = tsplib95.load('lib/fnl4461.tsp')
+    problem = tsplib95.load('lib/p654.tsp')
     graph = problem.get_graph()
     # mem_usage, retval= memory_usage((christofides, (graph,)), retval=True, max_usage=True)
     # peak_memory = mem_usage

@@ -3,6 +3,7 @@ import subprocess
 import tsplib95
 import re
 import csv
+import time
 
 # Configurações
 diretorio_das_instancias = "./lib"  # Ajuste para o seu caminho correto
@@ -17,7 +18,7 @@ def extrair_numero(nome_arquivo):
 
 # Iniciar log
 with open(arquivo_de_log, "w") as log_file:
-    log_file.write("Instancia, Algoritmo, Resultado, Tempo de execucao (s), Uso de memoria (MB), Qualidade da solucao (%)\n")
+    log_file.write("Instancia Algoritmo,Resultado,Tempo,Memoria,Qualidade\n")
 
 # Armazena a menor dimensão que falhou para cada algoritmo
 menor_dimensao_falha = {alg: float('inf') for alg in algoritmos.values()}
@@ -64,4 +65,11 @@ def executar_algoritmos_tsp():
                     print(f"{alg_nome} não será executado na instância {nome_arquivo} pois excedeu o tempo em uma instância de dimensão menor.")
 
 if __name__ == "__main__":
+    start = time.time()
+
     executar_algoritmos_tsp()
+
+    end = time.time()
+    execution_time = end - start
+
+    print("Tempo de execução dos testes:", execution_time)
