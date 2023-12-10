@@ -9,10 +9,10 @@ def extract_number_from_filename(filename):
     return int(numbers[0]) if numbers else -1
 
 def runApproximation():
-    instancesDir = "./lib"
+    instancesDir = "../lib"
     tspAlgorithms = {1: "tatt", 2: "ctfds"}
     timeLimit = 1800  # limit in seconds
-    logFilename = "results_tsp.txt"
+    logFilename = "results_approx.txt"
 
     # Log file header
     with open(logFilename, "w") as file:

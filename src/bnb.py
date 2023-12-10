@@ -108,7 +108,7 @@ def branch_and_bound(graph):
 if __name__ == "__main__":
     # test
     files = ['test10.tsp', 'test15.tsp']
-    folder = './test_bnb'
+    folder = '../test_bnb'
 
     # header
     with open('results_bnb.txt', 'w') as f:
