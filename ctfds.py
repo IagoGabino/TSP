@@ -7,53 +7,53 @@ def christofides(graph):
     start = time.time()
 
     # minimum spanning tree
-    MST = nx.minimum_spanning_tree(graph)
+    minSpanTree = nx.minimum_spanning_tree(graph)
 
     # find nodes with odd degree in MST
-    degrees = nx.degree(MST)
-    oddNodes = [x[0] for x in degrees if degrees[x[0]] % 2 == 1]
+    vertexDegrees = nx.degree(minSpanTree)
+    oddDegreeVertices = [x[0] for x in vertexDegrees if vertexDegrees[x[0]] % 2 == 1]
 
     # create subgraph of odd degree nodes
-    oddNodesSubgraph = nx.subgraph(graph, oddNodes)
+    oddVertexSubgraph = nx.subgraph(graph, oddDegreeVertices)
 
     # find minimum weight matching
-    matching = list(nx.min_weight_matching(oddNodesSubgraph, maxcardinality=True))
+    minWeightMatching = list(nx.min_weight_matching(oddVertexSubgraph, maxcardinality=True))
 
     # combine MST and matching
-    MSTMultiGraph = nx.MultiGraph(MST)
-    for edge in matching:
-        MSTMultiGraph.add_edge(edge[0], edge[1], weight=graph[edge[0]][edge[1]]['weight'])
+    combinedGraph = nx.MultiGraph(minSpanTree)
+    for edge in minWeightMatching:
+        combinedGraph.add_edge(edge[0], edge[1], weight=graph[edge[0]][edge[1]]['weight'])
 
     # find Eulerian circuit
-    eulerian_circuit = list(nx.eulerian_circuit(MSTMultiGraph, source=1))
+    eulerianCircuit = list(nx.eulerian_circuit(combinedGraph, source=1))
    
     visited = set()
-    hamiltonian_cycle = []
-    total_weight = 0
+    hamiltonianPath = []
+    totalWeight = 0
 
-    for u, v in eulerian_circuit:
+    for u, v in eulerianCircuit:
         if u not in visited:
-            hamiltonian_cycle.append(u)
+            hamiltonianPath.append(u)
             visited.add(u)
-            if len(hamiltonian_cycle) > 1:
-                total_weight += graph[hamiltonian_cycle[-2]][u]['weight']
+            if len(hamiltonianPath) > 1:
+                totalWeight += graph[hamiltonianPath[-2]][u]['weight']
 
     # Fechando o ciclo e adicionando o peso da última aresta
-    hamiltonian_cycle.append(hamiltonian_cycle[0])
-    total_weight += graph[hamiltonian_cycle[-2]][hamiltonian_cycle[-1]]['weight']
+    hamiltonianPath.append(hamiltonianPath[0])
+    totalWeight += graph[hamiltonianPath[-2]][hamiltonianPath[-1]]['weight']
 
     end = time.time()
-    execution_time = end - start
+    executionTime = end - start
 
-    return total_weight, hamiltonian_cycle, execution_time
+    return totalWeight, hamiltonianPath, executionTime
 
 # tests
 if __name__ == "__main__":
-    problem = tsplib95.load('lib/p654.tsp')
+    problem = tsplib95.load('lib/eil51.tsp')
     graph = problem.get_graph()
     # mem_usage, retval= memory_usage((christofides, (graph,)), retval=True, max_usage=True)
     # peak_memory = mem_usage
-    weight, path, execution_time = christofides(graph)
+    weight, path, executionTime = christofides(graph)
     print("Peso total:", weight)
     print("Caminho:", path)
-    print("Tempo de execução:", execution_time)
+    print("Tempo de execução:", executionTime)
